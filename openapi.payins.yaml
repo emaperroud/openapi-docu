@@ -1,0 +1,975 @@
+openapi: 3.1.0
+info:
+  description: Binco Backend Payins API
+  version: 0.0.1
+  title: Binco Backend Payins API
+  contact:
+    email: hola@houlak.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+tags:
+  - name: Merchant
+  - name: Payer
+  - name: Payment intent
+  - name: Payment method
+security:
+  - B2BAuth: []
+  - UserAuth: []
+paths:
+  /merchants:
+    get:
+      tags:
+        - Merchant
+      summary: Get merchants
+      description: Retrieve a list of merchants
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MerchantDTO'
+        '400':
+          description: Error getting the merchants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorGettingMerchants'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+    post:
+      tags:
+        - Merchant
+      summary: Create a merchant
+      description: Create a merchant (it is the entity that will receive the payments)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantRequest'
+        description: General information data about merchant
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantDTO'
+        '400':
+            description: Error creating the merchant
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorCreatingMerchant'
+        '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UnauthorizedError'
+  /merchants/{merchantId}:
+    get:
+      tags:
+        - Merchant
+      summary: Get a merchant
+      description: Retrieve the requested merchant
+      parameters:
+        - name: merchantId
+          in: path
+          required: true
+          description: The id of the merchant
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantDTO'
+        '400':
+          description: Error getting the merchant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorGettingMerchant'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+    put:
+      tags:
+        - Merchant
+      summary: Update a merchant
+      description: Update data of the requested merchant
+      parameters:
+        - name: merchantId
+          in: path
+          required: true
+          description: The id of the merchant
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantRequest'
+        description: General information data about merchant
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantDTO'
+        '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Error updating the merchant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUpdatingMerchant'
+    delete:
+      tags:
+        - Merchant
+      summary: Delete a merchant
+      description: Delete the requested merchant
+      parameters:
+        - name: merchantId
+          in: path
+          required: true
+          description: The id of the merchant
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Error deleting the merchant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDeletingMerchant'
+  /merchants/{merchantId}/issuers:
+    get:
+      tags:
+        - Merchant
+      summary: Get the issuers
+      description: Get the issuers related to a merchant
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssuerDTO'
+        '400':
+          description: Error getting the issuers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorGettingIssuers'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+  /payers:
+    get:
+      tags:
+        - Payer
+      summary: Get payers
+      description: Retrieve a list of payers
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PayerDTO'
+    post:
+      tags:
+        - Payer
+      summary: Create a payer
+      description: Create a payer (is the one who will make the payment)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayerRequest'
+        description: General information data about payer
+  /payers/{payerId}:
+    get:
+      tags:
+        - Payer
+      summary: Get a payer
+      description: Retrieve the requested payer
+      parameters:
+        - name: payerId
+          in: path
+          required: true
+          description: The id of the payer
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayerDTO'
+    put:
+      tags:
+        - Payer
+      summary: Update a payer
+      description: Update data of the requested payer
+      parameters:
+        - name: payerId
+          in: path
+          required: true
+          description: The id of the payer
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePayerRequest'
+        description: General information data about payer
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayerDTO'
+    delete:
+      tags:
+        - Payer
+      summary: Delete a payer
+      description: Delete the requested payer
+      parameters:
+        - name: payerId
+          in: path
+          required: true
+          description: The id of the payer
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+  /payers/{payerId}/payment_methods:
+    get:
+      tags:
+        - Payer
+        - Payment method
+      summary: Get payer's payment methods
+      description: Retrieve a list of payer's payment methods
+      parameters:
+        - name: payerId
+          in: path
+          required: true
+          description: The id of the payer
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentMethodDTO'
+  /payment-intents:
+    post:
+      tags:
+        - Payment intent
+      summary: Create a payment intent
+      description: Create a payment intent with an option to create a payment method and charge it automatically
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentIntentRequest'
+        description: General information data about payment intent, if paymentMethodData is sent and paymentMethodId is not, tries to create paymentMethod and after charge it
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntentDTO'
+  /payment-methods:
+    get:
+      tags:
+        - Payment method
+      summary: Get payment methods
+      description: Retrieve a list of payment methods
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentMethodDTO'
+    post:
+      tags:
+        - Payment method
+      summary: Create payment method
+      description: Create payment method (it is possible to use existing or create one in this step)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentMethodRequest'
+        description: Payment method data
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodResponse'
+  /payment-methods/{paymentMethodId}:
+    get:
+      tags:
+        - Payment method
+      summary: Get payment method
+      description: Retrieve the requested payment method
+      parameters:
+        - name: paymentMethodId
+          in: path
+          required: true
+          description: The id of the payment method
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodDTO'
+sservers:
+  - url: https://binco-backend-payins-dev.houlak.com/api/v1
+components:
+  securitySchemes:
+    B2BAuth:
+      type: apiKey
+      in: header
+      name: api-key
+      description: |
+        Additionally, include the signature of the request body using the 'signature' header,
+        should be encrypted with HMAC-SHA256 using api-secret.
+        api-key and api-secret can be obtained by registering through the authentication API.
+    UserAuth:
+      type: http
+      scheme: basic
+      description: |
+        Provide your email and password using the Basic authentication scheme after registering
+        and confirming your email through the authentication API.
+  schemas:
+    Gateway:
+      type: string
+      enum:
+        - PLEXO
+    Currency:
+      type: string
+      enum:
+        - UYU
+        - USD
+        - EUR
+    PayinType:
+      type: string
+      enum:
+        - DEFAULT
+        - TRANSFER
+    PayinStatus:
+      type: string
+      enum:
+        - REQUIRES_PAYMENT_METHOD
+        - REQUIRES_CONFIRMATION
+        - REQUIRES_ACTION
+        - PROCESSING
+        - SUCCESSFUL
+    ConfirmationMethod:
+      type: string
+      enum:
+        - MANUAL
+        - AUTOMATIC
+    PaymentMethodType:
+      type: string
+      enum:
+        - CARD
+        - A2A
+        - PIX
+    DocumentType:
+      type: string
+      enum:
+        - PASSPORT
+        - IDENTITY_DOCUMENT
+        - DNI
+    BankAccount:
+      type: object
+      properties:
+        accountNumber:
+          type: string
+          description: Bank account where funds will be transferred
+          maxLength: 255
+        bank:
+          type: string
+          format: uuid
+        accountCurrency:
+          $ref: '#/components/schemas/Currency'
+    Account:
+      type: object
+      properties:
+        bincoAccount:
+          type: string
+          format: uuid
+        bankAccount:
+          $ref: '#/components/schemas/BankAccount'
+    MerchantRequest:
+      type: object
+      required: [businessId, merchantName]
+      properties:
+        businessId:
+          type: string
+          format: uuid
+        account:
+          $ref: '#/components/schemas/Account'
+        merchantName:
+          type: string
+          maxLength: 128
+        email:
+          type: string
+          maxLength: 128
+        phone:
+          type: string
+          maxLength: 128
+        address:
+          $ref: '#/components/schemas/AddressRequest'
+        metadata:
+          type: string
+    MerchantDTO:
+      type: object
+      properties:
+        merchantId:
+          type: string
+          format: uuid
+        businessId:
+          type: string
+          format: uuid
+        account:
+          $ref: '#/components/schemas/Account'
+        merchantName:
+          type: string
+        externalId:
+          type: string
+          format: uuid
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          $ref: '#/components/schemas/AddressRequest'
+        metadata:
+          type: string
+    PayerDTO:
+      type: object
+      properties:
+        payerId:
+          type: string
+          format: uuid
+        externalId:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        documentType:
+          $ref: '#/components/schemas/DocumentType'
+        documentNumber:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          $ref: '#/components/schemas/AddressRequest'
+    PayerRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          maxLength: 128
+        lastName:
+          type: string
+          maxLength: 128
+        documentType:
+           $ref: '#/components/schemas/DocumentType'
+        document:
+          type: string
+          maxLength: 128
+        email:
+          type: string
+          maxLength: 128
+        deviceFingerprint:
+          type: string
+        merchantId:
+          type: string
+          format: uuid
+        address:
+          $ref: '#/components/schemas/AddressRequest'
+        phone:
+          type: string
+          maxLength: 128
+        gateway:
+           $ref: '#/components/schemas/Gateway'
+    CreatePayerResponse:
+      type: object
+      properties:
+        payer:
+          $ref: '#/components/schemas/PayerDTO'
+        gatewayUrl:
+          type: string
+    UpdatePayerRequest:
+      type: object
+      properties:
+        merchantExternalId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          maxLength: 128
+        address:
+          $ref: '#/components/schemas/AddressRequest'
+        phone:
+          type: string
+          maxLength: 128
+    PaymentIntentRequest:
+      type: object
+      required:
+        [
+          currency,
+          amount,
+          payinType,
+          externalReference,
+          paymentMethodId,
+          paymentMethodData,
+          payerId,
+          nextAction,
+          setupFutureUsage,
+          offSession,
+          metadata,
+          invoiceNumber,
+        ]
+      properties:
+        currency:
+          $ref: '#/components/schemas/Currency'
+        amount:
+          type: number
+        payinType:
+          $ref: '#/components/schemas/PayinType'
+        merchantId:
+          type: string
+          format: uuid
+        externalReference:
+          type: string
+          maxLength: 128
+        paymentMethodId:
+          type: string
+          format: uuid
+        paymentMethodData:
+          $ref: '#/components/schemas/PaymentMethodRequest'
+        confirm:
+          type: boolean
+        payerId:
+          type: string
+          format: uuid
+        payerData:
+          $ref: '#/components/schemas/PayerRequest'
+        nextAction:
+          type: string
+          maxLength: 128
+        setupFutureUsage:
+          type: boolean
+        offSession:
+          type: boolean
+        metadata:
+          type: string
+        invoiceNumber:
+          type: number
+        cibersourceFingerprint:
+          type: string
+    CreatePaymentIntentResponse:
+      type: object
+      properties:
+        paymentIntent:
+          $ref: '#/components/schemas/PaymentIntentDTO'
+        clientSecret:
+          type: string
+        confirmationMethod:
+          $ref: '#/components/schemas/ConfirmationMethod'
+        status:
+          $ref: '#/components/schemas/PayinStatus'
+        nextAction:
+          type: string
+    PaymentIntentDTO:
+      type: object
+      properties:
+        paymentIntentId:
+          type: string
+          format: uuid
+        businessId:
+          type: string
+          format: uuid
+        payerId:
+          type: string
+          format: uuid
+        paymentMethodId:
+          type: string
+          format: uuid
+        payinType:
+          $ref: '#/components/schemas/PayinType'
+        paymentIntentStatus:
+          $ref: '#/components/schemas/PayinStatus'
+        lastPaymentError:
+          type: string
+        externalReference:
+          type: string
+        externalChargeId:
+          type: string
+        externalInvoiceId:
+          type: string
+        invoiceEmail:
+          type: string
+        description:
+          type: string
+        currency:
+          $ref: '#/components/schemas/Currency'
+        subtotalAmount:
+          type: number
+        taxAmount:
+          type: number
+        tipAmount:
+          type: number
+        totalAmount:
+          type: number
+        receivedAmount:
+          type: number
+        confirmationMethod:
+          type: number
+        nextAction:
+          type: number
+        clientSecret:
+          type: number
+        statementDescriptor:
+          type: number
+        cancelledAt:
+          type: string
+          format: date-time
+        cancellationReason:
+          type: string
+        receiptEmail:
+          type: string
+        setupFutureUsage:
+          type: string
+        metadata:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    PaymentMethodRequest:
+      type: object
+      properties:
+        payerId:
+          type: string
+          format: uuid
+        payerData:
+          $ref: '#/components/schemas/PayerRequest'
+        paymentMethodType:
+          $ref: '#/components/schemas/PaymentMethodType'
+        businessId:
+          type: string
+          format: uuid
+        merchantId:
+          type: string
+          format: uuid
+        countries:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: object
+      required:
+        - businessId
+        - merchantId
+        - paymentMethodType
+    PaymentMethodResponse:
+      type: object
+      properties:
+        merchantId:
+          type: string
+          format: uuid
+        businessId:
+          type: string
+          format: uuid
+        payerId:
+          type: string
+          format: uuid
+        paymentMethodType:
+          $ref: '#/components/schemas/PaymentMethodType'
+        metadata:
+          type: object
+      nextAction:
+        type: string
+    PaymentMethodDTO:
+      type: object
+      properties:
+        paymentMethodId:
+          type: string
+          format: uuid
+        merchantId:
+          type: string
+          format: uuid
+        businessId:
+          type: string
+          format: uuid
+        payerId:
+          type: string
+          format: uuid
+        paymentMethodStatus:
+          type: string
+        paymentMethodType:
+          $ref: '#/components/schemas/PaymentMethodType'
+        externalId:
+          type: string
+        active:
+          type: boolean
+        validated:
+          type: boolean
+        countries:
+          type: string
+          format: array
+        metadata:
+          type: object
+        nextAction:
+          type: string
+    AddressRequest:
+      type: object
+      properties:
+        country:
+          type: string
+          format: uuid
+        state:
+          type: string
+          maxLength: 128
+        city:
+          type: string
+          maxLength: 128
+        street:
+          type: string
+          maxLength: 128
+        doorNumber:
+          type: string
+          maxLength: 128
+        apartmentNumber:
+          type: string
+          maxLength: 128
+        zipCode:
+          type: string
+          maxlength: 128
+    IssuerDTO:
+      type: object
+      properties:
+        issuerId:
+          type: string
+          format: uuid
+    ErrorGettingIssuers:
+      type: object
+      properties:
+        message:
+          type: string
+          examples: ['Error getting the issuers']
+        showMessage:
+          type: object
+          properties:
+            EN:
+              type: string
+              examples: ['Error getting the issuers']
+            ES:
+              type: string
+              examples: ['Error al obtener los emisores']
+        needUpdate:
+          type: boolean
+          examples: [false]
+        errorId:
+          type: string
+          examples: ['Payins.ERROR_IN_GET_ISSUERS']
+    UnauthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+          examples: ["Unauthorized"]
+        showMessage:
+          type: object
+          properties:
+            EN:
+              type: string
+              examples: ["Unauthorized"]
+            ES:
+              type: string
+              examples: ["No autorizado"]
+        needUpdate:
+          type: boolean
+          examples: [false]
+        errorId:
+          type: string
+          examples: ["Auth:UNAUTHORIZED"]
+    ErrorGettingMerchants:
+      type: object
+      properties:
+        message:
+          type: string
+          examples: ["Error getting the merchants"]
+        showMessage:
+          type: object
+          properties:
+            EN:
+              type: string
+              examples: ["Error getting the merchants"]
+            ES:
+              type: string
+              examples: ["Error al obtener los merchants"]
+        needUpdate:
+          type: boolean
+          examples: [false]
+        errorId:
+          type: string
+          examples: ["Payins:ERROR_IN_GET_MERCHANTS"]
+    ErrorCreatingMerchant:
+      type: object
+      properties:
+        message:
+          type: string
+          examples: ["Error creating the merchant"]
+        showMessage:
+          type: object
+          properties:
+            EN:
+              type: string
+              examples: ["Error creating the merchant"]
+            ES:
+              type: string
+              examples: ["Ocurrió un error en la creación del merchant"]
+        needUpdate:
+          type: boolean
+          examples: [false]
+        errorId:
+          type: string
+          examples: ["Payins:ERROR_IN_CREATE_MERCHANT"]
+    ErrorGettingMerchant:
+      type: object
+      properties:
+        message:
+          type: string
+          examples: ["Error getting the merchant"]
+        showMessage:
+          type: object
+          properties:
+            EN:
+              type: string
+              examples: ["Error getting the merchant"]
+            ES:
+              type: string
+              examples: ["Error al obtener el merchant"]
+        needUpdate:
+          type: boolean
+          examples: [false]
+        errorId:
+          type: string
+          examples: ["Payins:ERROR_IN_GET_MERCHANT"]
+    ErrorUpdatingMerchant:
+      type: object
+      properties:
+        message:
+          type: string
+          examples: ["Error updating the merchant"]
+        showMessage:
+          type: object
+          properties:
+            EN:
+              type: string
+              examples: ["Error updating the merchant"]
+            ES:
+              type: string
+              examples: ["Ocurrió un error en la actualización del merchant"]
+        needUpdate:
+          type: boolean
+          examples: [false]
+        errorId:
+          type: string
+          examples: ["Payins:ERROR_IN_UPDATE_MERCHANT"]
+    ErrorDeletingMerchant:
+      type: object
+      properties:
+        message:
+          type: string
+          examples: ["Error deleting the merchant"]
+        showMessage:
+          type: object
+          properties:
+            EN:
+              type: string
+              examples: ["Error deleting the merchant"]
+            ES:
+              type: string
+              examples: ["Ocurrió un error al intentar borrar el merchant"]
+        needUpdate:
+          type: boolean
+          examples: [false]
+        errorId:
+          type: string
+          examples: ["Payins:ERROR_IN_DELETE_MERCHANT"]
